@@ -1,0 +1,24 @@
+web:
+  build: web
+  ports:
+   - "8000:80"
+  links:
+   - app
+
+app:
+  build: app
+  ports:
+   - "9000:8080"
+  links:
+   - db
+  volumes:
+   - ./app:/dist
+  # map the node_modules folder built into the app container because the above volume mapping
+  # removes/hides it. This means you'll need to stop, build and re-up the container when changing
+  # npm dependencies.
+   - /dist/node_modules
+
+db:
+  image: mongo:latest
+  ports:
+  - "27017:27017"

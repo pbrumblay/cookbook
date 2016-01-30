@@ -1,0 +1,24 @@
+{
+  "name": "JS-Cookbook",
+  "description": "a sample app to test drive a node.js-based service",
+  "version": "0.0.1",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "nodemon -L app.js",
+    "test": "npm run test-tape",
+    "test-tape": "node tests-tape/cookbook.js && node tests-tape/app.js"
+  },
+  "dependencies": {
+    "mongodb": "^2.0.52",
+    "mongoose": "^4.3.2",
+    "restify": "^4.0.3"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "coverify": "^1.4.1",
+    "proxyquire": "^1.7.3",
+    "sinon": "^1.17.2",
+    "tape": "^4.4.0"
+  }
+}
