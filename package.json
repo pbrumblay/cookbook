@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "nodemon -L app.js",
+    "start": "nodemon -L server.js",
     "test": "npm run test-tape",
     "test-tape": "node tests-tape/cookbook.js && node tests-tape/app.js"
   },

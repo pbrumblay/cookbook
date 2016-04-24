@@ -1,15 +1,16 @@
-var restify = require('restify');
+'use strict';
+const restify = require('restify');
 
-var MongoReadModel = require("./model/mongo/mongo-read-model");
-var MongoWriteModel = require("./model/mongo/mongo-write-model");
-var Cookbook = require('./cookbook');
+const ReadModel = require("./model/read-model");
+const WriteModel = require("./model/write-model");
+const Cookbook = require('./cookbook');
 
-readModel = new MongoReadModel();
-writeModel = new MongoWriteModel();
-var cookbook = new Cookbook(readModel, writeModel);
+let readModel = new ReadModel();
+let writeModel = new WriteModel();
+let cookbook = new Cookbook(readModel, writeModel);
 
 function getAll(req, res, next) {
-  var searchFilter = req.query.searchText;
+  let searchFilter = req.query.searchText;
   cookbook.listRecipes(searchFilter).then(function (recipes) {
     res.send(recipes);
     next();
@@ -28,7 +29,6 @@ function get(req, res, next) {
 }
 
 function getCategories(req, res, next) {
-  "use strict";
   res.send(["Beef", "Chicken", "Pork", "Vegetarian"]);
   next();
 }
@@ -84,7 +84,7 @@ function throwOut(req, res, next) {
 
 /* Initialize server and routes */
 
-var server = restify.createServer();
+let server = restify.createServer();
 server.use(restify.bodyParser());
 server.use(restify.queryParser());
 

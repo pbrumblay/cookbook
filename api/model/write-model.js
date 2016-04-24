@@ -1,12 +1,12 @@
 'use strict';
 
-var db = require('./mongo-db');
+var db = require('./db');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 var Recipe = mongoose.model('Recipe');
 
-class MongoWriteModel {
+class WriteModel {
   createRecipe(recipe) {
     // Get the maximum Id in use. Save this recipe with maxId + 1
     return Recipe.findOne().sort("-Id").limit(1).then(function (r) {
@@ -27,4 +27,4 @@ class MongoWriteModel {
   }
 }
 
-module.exports = MongoWriteModel;
+module.exports = WriteModel;

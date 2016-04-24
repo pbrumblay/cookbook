@@ -1,12 +1,12 @@
 'use strict';
 
-var db = require('./mongo-db');
+var db = require('./db');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 var Recipe = mongoose.model('Recipe');
 
-class MongoReadModel {
+class ReadModel {
   getAll(searchFilter) {
     if(searchFilter) {
       let regex = new RegExp(searchFilter, "i")
@@ -23,4 +23,4 @@ class MongoReadModel {
   }
 }
 
-module.exports = MongoReadModel;
+module.exports = ReadModel;
