@@ -1,31 +1,35 @@
 'use strict';
-const restify = require('restify');
+const Path = require('path');
+const Hapi = require('hapi');
+const Inert = require('inert');
 
-const ReadModel = require("./model/read-model");
-const WriteModel = require("./model/write-model");
-const Cookbook = require('./cookbook');
+const ReadModel = require("./api/model/read-model");
+const WriteModel = require("./api/model/write-model");
+const Cookbook = require('./api/cookbook');
 
 let readModel = new ReadModel();
 let writeModel = new WriteModel();
 let cookbook = new Cookbook(readModel, writeModel);
 
-function getAll(req, res, next) {
-  let searchFilter = req.query.searchText;
+function getAll(request, reply) {
+  let searchFilter = request.query.searchText;
   cookbook.listRecipes(searchFilter).then(function (recipes) {
-    res.send(recipes);
-    next();
+    reply(recipes);
   });
 }
 
-function get(req, res, next) {
-  cookbook.findRecipe(req.params.id).then(function (recipe) {
-    if (recipe) {
-      res.send(recipe);
-    } else {
-      res.send(404);
-    }
-    next();
-  });
+function get(request, reply) {
+  if(request.params.param) {
+    cookbook.findRecipe(request.params.param).then(function (recipe) {
+      if (recipe) {
+        reply(recipe);
+      } else {
+        reply.send(404);
+      }
+    });
+  } else {
+    getAll(request, reply);
+  }
 }
 
 function getCategories(req, res, next) {
@@ -84,17 +88,40 @@ function throwOut(req, res, next) {
 
 /* Initialize server and routes */
 
-let server = restify.createServer();
-server.use(restify.bodyParser());
-server.use(restify.queryParser());
+const server = new Hapi.Server({
+  connections: {
+    routes: {
+      files: {
+        relativeTo: Path.join(__dirname, '.')
+      }
+    }
+  }
+});
+server.connection({ port: 80 });
 
-server.get('/recipes', getAll);
-server.get('/categories', getCategories);
-server.post('/recipes', create);
-server.get('/recipes/:id', get);
-server.put('/recipes/:id', save);
-server.del('/recipes/:id', throwOut);
+server.register(Inert, () => {})
 
-server.listen(8080, function() {
-  console.log('%s listening at %s', server.name, server.url);
+server.route({
+  method: 'GET',
+  path: '/{param*}',
+  handler: {
+    directory: {
+      path: 'www'
+    }
+  }
+});
+
+server.route({
+  method: 'GET',
+  path: '/api/recipes/{param*}',
+  handler: get
+});
+
+server.start((err) => {
+
+  if (err) {
+    throw err;
+  }
+
+  console.log('Server running at:', server.info.uri);
 });

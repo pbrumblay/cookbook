@@ -1,10 +1,8 @@
 'use strict';
 
 let test = require('tape');
-let ReadModel = require("../model/json/json-read-model");
-let WriteModel = require("../model/json/json-write-model");
-let FakeReadModel = require('../tests/fake-read-model');
-let Cookbook = require('../cookbook');
+let FakeReadModel = require('.fake-read-model');
+let Cookbook = require('../api/cookbook');
 let sourceRecipes = require('../model/json/recipes.json');
 let sut = new Cookbook(new ReadModel(), new WriteModel());
 

@@ -5,14 +5,13 @@ COPY package.json /tmp/package.json
 RUN cd /tmp && npm install
 RUN mkdir -p /dist && cp -a /tmp/node_modules /dist/
 
-COPY robots.txt /dist/
-COPY content /dist/content/
+COPY www /dist/www/
 COPY api /dist/api/
-COPY client /dist/client/
-COPY index.html /dist/
+COPY server.js /dist/
+COPY start.sh /dist/
 
 WORKDIR /dist
 
 EXPOSE 80
 
-CMD npm start
+CMD ./start.sh

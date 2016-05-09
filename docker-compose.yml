@@ -1,16 +1,21 @@
-order-history:
+server:
   build: .
   ports:
    - "8080:80"
    - "5858:5858"
   links:
-   - mongo
+   - db
   environment:
    - DEBUG=true
   volumes:
    - .:/dist
 
-mongo:
- image: mongo:latest
- ports:
- - "27017:27017"
+db:
+  image: mongo:latest
+  ports:
+  - "27017:27017"
+
+import:
+  image: pbrumblay/cookbook-import:latest
+  links:
+   - db

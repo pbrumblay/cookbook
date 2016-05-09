@@ -6,19 +6,19 @@
   "private": true,
   "scripts": {
     "start": "nodemon -L server.js",
+    "debug": "nodemon --debug -L server.js",
+    "debug-brk": "nodemon --debug-brk -L server.js",
     "test": "npm run test-tape",
     "test-tape": "node tests-tape/cookbook.js && node tests-tape/app.js"
   },
   "dependencies": {
+    "hapi": "^13.3.0",
+    "inert": "^3.2.0",
     "mongodb": "^2.0.52",
     "mongoose": "^4.3.2",
-    "restify": "^4.0.3"
+    "path": "^0.12.7"
   },
   "devDependencies": {
-    "chai": "*",
-    "coverify": "^1.4.1",
-    "proxyquire": "^1.7.3",
-    "sinon": "^1.17.2",
     "tape": "^4.4.0"
   }
 }
