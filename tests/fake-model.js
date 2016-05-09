@@ -66,29 +66,40 @@ let recipes = [
     {
         "Name":"Potion of Invisibility",
         "Description":"This recipe is invisible",
-        "Visible":true,
+        "Visible":false,
         "Favorite":false,
         "Ingredients":[],
         "CategoryName":"Mexican",
-        "Id":4
+        "Id":19
     }
 ];
 
-class FakeReadModel {
+class FakeModel {
     getAll() {
-        return new Promise(function (resolve, reject) {
+        return new Promise(resolve => {
             resolve(recipes);
         });
     }
 
     getRecipeById(id) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(resolve => {
             var result = recipes.find(function (r) {
                 return r.Id == id;
             });
             resolve(result);
         });
     }
+
+    createRecipe(recipe) {
+        return new Promise(resolve => {
+            recipes.push(recipe);
+            resolve();
+        });
+    }
+
+    getInternalRecipes() {
+        return recipes;
+    }
 }
 
-module.exports = FakeReadModel;
+module.exports = FakeModel;

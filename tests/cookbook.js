@@ -1,45 +1,44 @@
 'use strict';
 
-let test = require('tape');
-let FakeReadModel = require('.fake-read-model');
-let Cookbook = require('../api/cookbook');
-let sourceRecipes = require('../model/json/recipes.json');
-let sut = new Cookbook(new ReadModel(), new WriteModel());
+const test = require('tape');
+const FakeModel = require('./fake-model');
+const Cookbook = require('../api/cookbook');
+let fakeModel = new FakeModel();
+let sut = new Cookbook(fakeModel, fakeModel);
 
 test('Find a Recipe', function (t) {
-    //experiment with a fake object:
-    let fakeReadModel = new FakeReadModel();
-    let writeModel = new WriteModel();
-    let fakeedSut = new Cookbook(fakeReadModel, writeModel);
+    sut.findRecipe(3).then(function (recipe) {
 
-    fakeedSut.findRecipe(3).then(function (recipe) {
-        t.notEqual(null, recipe, 'We have a recipe');
-        t.notEqual(null, recipe.Ingredients, 'We have recipe ingredients');
-        t.equal(sourceRecipes[2].Name, recipe.Name, 'Recipe names are equal');
-        t.equal(sourceRecipes[2].Description, recipe.Description, 'Recipe descriptions are equal');
+        t.ok(recipe, 'We have a recipe');
+        t.ok(recipe.Ingredients, 'We have recipe ingredients');
+        t.equal(recipe.Name, fakeModel.getInternalRecipes()[2].Name, 'Recipe names are equal');
+        t.equal(recipe.Description, fakeModel.getInternalRecipes()[2].Description, 'Recipe descriptions are equal');
         t.end();
     });
 });
 
 test('Cannot Find Invisible Recipe', function (t) {
+
     sut.findRecipe(19).then(function (recipe) {
-        t.equal(null, recipe, 'Invisible recipes cannot be found');
+        t.equal(recipe, null, 'Invisible recipes cannot be found');
         t.end();
     });
 });
 
 test('List Recipes', function (t) {
+
     sut.listRecipes().then(function (recipeList) {
-        t.plan(3);
-        t.notEqual(null, recipeList, 'We have a list of recipes');
-        t.equal(115, recipeList.length, 'All visible recipes listed');
-        t.equal(1, recipeList[0].Id, 'Recipes returned in Id order');
+
+        t.notEqual(recipeList, null, 'We have a list of recipes');
+        t.equal(recipeList.length, 3, 'All visible recipes listed');
+        t.end();
     });
 });
 
 test('Add Test Recipe', function (t) {
-    t.plan(3);
+
     let recipe = {
+        "Id": 42,
         "Name":"Pizza",
         "Description":"Plain Jane American food.",
         "Visible":true,
@@ -59,9 +58,10 @@ test('Add Test Recipe', function (t) {
     sut.addRecipe(recipe)
     .then(function() {
         sut.findRecipe(recipe.Id).then(function (found) {
-            t.notEqual(null, found, 'Our new recipe is not null');
+            t.notEqual(found, null, 'Our new recipe is not null');
             t.ok(found.Id > 0, 'Our new recipe Id is > 0');
-            t.equal(recipe.Id, found.Id, 'Our new recipe Id is a match');
+            t.equal(found.Id, recipe.Id, 'Our new recipe Id is a match');
+            t.end();
         });
     })
     .catch(function(e) {

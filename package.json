@@ -8,8 +8,7 @@
     "start": "nodemon -L server.js",
     "debug": "nodemon --debug -L server.js",
     "debug-brk": "nodemon --debug-brk -L server.js",
-    "test": "npm run test-tape",
-    "test-tape": "node tests-tape/cookbook.js && node tests-tape/app.js"
+    "test": "node tests/cookbook.js"
   },
   "dependencies": {
     "hapi": "^13.3.0",
