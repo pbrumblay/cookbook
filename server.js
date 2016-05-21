@@ -2,73 +2,8 @@
 const Path = require('path');
 const Hapi = require('hapi');
 const Inert = require('inert');
-
-const ReadModel = require("./api/model/read-model");
-const WriteModel = require("./api/model/write-model");
-const Cookbook = require('./api/cookbook');
-
-let readModel = new ReadModel();
-let writeModel = new WriteModel();
-let cookbook = new Cookbook(readModel, writeModel);
-
-function getAll(request, reply) {
-  let searchFilter = request.query.searchText;
-  cookbook.listRecipes(searchFilter).then(function (recipes) {
-    reply(recipes);
-  });
-}
-
-function get(request, reply) {
-  if(request.params.param) {
-    cookbook.findRecipe(request.params.param).then(function (recipe) {
-      if (recipe) {
-        reply(recipe);
-      } else {
-        reply.send(404);
-      }
-    });
-  } else {
-    getAll(request, reply);
-  }
-}
-
-function getCategories(req, res, next) {
-  res.send(["Beef", "Chicken", "Pork", "Vegetarian"]);
-  next();
-}
-
-function create(req, res, next) {
-    cookbook.addRecipe(req.body).then(function (r) {
-      res.setHeader('Location', req.url + "/" + req.body.Id);
-      res.send(201);
-      next();
-    }).catch(function (e) {
-      if (e.name === "BadRequestError") {
-        res.send(400, e.message);
-      } else {
-        res.send(500, e.message);
-      }
-      next();
-    });
-}
-
-function save(req, res, next) {
-  var recipe = req.body;
-  cookbook.changeRecipe(req.params.id, recipe).then(function (r) {
-    res.send(recipe);
-    next();
-  }).catch(function (e) {
-    if (e.name === "BadRequestError") {
-      res.send(400, e.message);
-    } else if (e.message === "Recipe ID not found."){
-      console.log('responding 404');
-      res.send(404);
-    } else {
-      console.log('responding 500');
-      res.send(500, e.message);
-    }
-  });
-}
+const api = require('./api/api');
+const healthcheck = require('./api/healthcheck');
 
 function throwOut(req, res, next) {
   cookbook.throwOutRecipe(req.params.id).then(function (r) {
@@ -114,7 +49,43 @@ server.route({
 server.route({
   method: 'GET',
   path: '/api/recipes/{param*}',
-  handler: get
+  handler: api.get
+});
+
+server.route({
+  method: 'PUT',
+  path: '/api/recipes/{param*}',
+  handler: api.changeRecipe
+});
+
+server.route({
+  method: 'POST',
+  path: '/api/recipes',
+  handler: api.create
+});
+
+server.route({
+  method: 'GET',
+  path: '/api/categories/{param*}',
+  handler: api.getCategories
+});
+
+server.route({
+  method: 'GET',
+  path: '/api/',
+  handler: healthcheck.hello
+});
+
+server.route({
+  method: 'GET',
+  path: '/api/live',
+  handler: healthcheck.live
+});
+
+server.route({
+  method: 'GET',
+  path: '/api/ready',
+  handler: healthcheck.ready
 });
 
 server.start((err) => {

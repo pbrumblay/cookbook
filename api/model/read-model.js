@@ -21,6 +21,12 @@ class ReadModel {
   getRecipeById(id) {
     return Recipe.findOne({ "Id": id });
   }
+
+  getDistinctCategories() {
+    return Recipe.find().distinct("CategoryName").then(f => {
+      return f.sort();
+    });
+  }
 }
 
 module.exports = ReadModel;
