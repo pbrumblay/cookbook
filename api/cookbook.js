@@ -7,40 +7,35 @@ const Boom = require('boom');
 const readModel = new ReadModel();
 const writeModel = new WriteModel();
 
+/**
+ * Validates recipe input for required name and ingredients.
+ */
+function validateRecipe(recipe) {
+    if (!recipe.Name || recipe.Name.length === 0) {
+        return Boom.badRequest("Recipe name is required.");
+    } else if (!recipe.Ingredients || recipe.Ingredients.length === 0) {
+        return Boom.badRequest("Ingredients are required.");
+    }
+    return null;
+}
 
-let api = (function () {
+function isVisible(recipe) {
+    return recipe.Visible;
+}
 
-    /**
-     * Validates recipe input for required name and ingredients.
-     * Throws an Error with name 'BadRequestError' if validation fails.
-     */
-    function validateRecipe(recipe) {
-        if (!recipe.Name || recipe.Name.length === 0) {
-            return Boom.badRequest("Recipe name is required.");
-        } else if (!recipe.Ingredients || recipe.Ingredients.length === 0) {
-            return Boom.badRequest("Ingredients are required.");
+function getAll (request, reply) {
+    const searchFilter = request.query.searchText;
+    const result = readModel.getAll(searchFilter).then(
+        foundRecipes => {
+            return foundRecipes.filter(isVisible);
         }
-        return null;
-    }
+    );
+    return reply(result);
+}
 
-    function isVisible(recipe) {
-        return recipe.Visible;
-    }
+class Cookbook  {
 
-    function getAll (request, reply) {
-        const searchFilter = request.query.searchText;
-        const result = readModel.getAll(searchFilter).then(
-            foundRecipes => {
-                return foundRecipes.filter(isVisible);
-            }
-        );
-        return reply(result);
-    }
-
-
-    /** PUBLIC **/
-
-    function get(request, reply) {
+    get(request, reply) {
         const id = request.params.param;
         if(!id) {
             return getAll(request, reply);
@@ -56,11 +51,11 @@ let api = (function () {
         }
     }
 
-    function getCategories(request, reply) {
+    getCategories(request, reply) {
         reply(readModel.getDistinctCategories());
     }
 
-    function changeRecipe(request, reply) {
+    changeRecipe(request, reply) {
         const id = request.params.param;
         const updatedRecipe = request.payload;
 
@@ -78,7 +73,7 @@ let api = (function () {
         return reply(result);
     }
 
-    function deleteRecipe(request, reply) {
+    deleteRecipe(request, reply) {
         const id = request.params.param;
 
         const result = readModel.getRecipeById(id).then(storedRecipe => {
@@ -96,7 +91,7 @@ let api = (function () {
         return reply(result);
     }
 
-    function create(request, reply) {
+    create(request, reply) {
         const newRecipe = request.payload;
 
         const validationError = validateRecipe(newRecipe);
@@ -104,15 +99,6 @@ let api = (function () {
 
         return reply(writeModel.createRecipe(newRecipe));
     }
+}
 
-
-    return {
-        get: get,
-        getCategories: getCategories,
-        changeRecipe: changeRecipe,
-        create: create
-    }
-
-})();
-
-module.exports = api;
+module.exports = new Cookbook();

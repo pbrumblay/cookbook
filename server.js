@@ -2,24 +2,8 @@
 const Path = require('path');
 const Hapi = require('hapi');
 const Inert = require('inert');
-const api = require('./api/api');
+const cookbook = require('./api/cookbook');
 const healthcheck = require('./api/healthcheck');
-
-function throwOut(req, res, next) {
-  cookbook.throwOutRecipe(req.params.id).then(function (r) {
-    res.send(200);
-    next();
-  }).catch(function (e) {
-    if (e.message === "Recipe ID not found.") {
-      res.send(404);
-    } else if (e.message === "Cannot delete a favorite!") {
-      res.send(405, e.message);
-    } else {
-      res.send(500, e.message);
-    }
-    next();
-  });
-}
 
 /* Initialize server and routes */
 
@@ -49,25 +33,25 @@ server.route({
 server.route({
   method: 'GET',
   path: '/api/recipes/{param*}',
-  handler: api.get
+  handler: cookbook.get
 });
 
 server.route({
   method: 'PUT',
   path: '/api/recipes/{param*}',
-  handler: api.changeRecipe
+  handler: cookbook.changeRecipe
 });
 
 server.route({
   method: 'POST',
   path: '/api/recipes',
-  handler: api.create
+  handler: cookbook.create
 });
 
 server.route({
   method: 'GET',
   path: '/api/categories/{param*}',
-  handler: api.getCategories
+  handler: cookbook.getCategories
 });
 
 server.route({
