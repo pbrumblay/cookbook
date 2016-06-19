@@ -3,7 +3,7 @@
 angular.module('app.controllers', [])
 
     // Path: /
-    .controller('homeController', ['$scope', '$filter', 'searchSvc', 'getSvc', 'getCategoriesSvc', 'saveRecipeSvc', function ($scope, $filter, searchSvc, getSvc, getCategoriesSvc,  saveRecipeSvc) {
+    .controller('homeController', ['$scope', '$filter', '$http', 'searchSvc', 'getSvc', 'getCategoriesSvc', 'saveRecipeSvc', function ($scope, $filter, $http, searchSvc, getSvc, getCategoriesSvc,  saveRecipeSvc) {
         $scope.$root.title = 'Recipes';
 
         $scope.showSuccess = false;
@@ -32,6 +32,11 @@ angular.module('app.controllers', [])
                         $scope.error = error;
                     });
             }
+        }
+
+        $scope.login = function(googleToken) {
+            var payload = { idToken: googleToken };
+            return $http.post('/api/auth', payload);
         }
 
         $scope.addNew = function () {

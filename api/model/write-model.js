@@ -11,7 +11,7 @@ class WriteModel {
     // Get the maximum Id in use. Save this recipe with maxId + 1
     return Recipe.findOne().sort("-Id").limit(1).then(function (r) {
       recipe.Id = r.Id + 1;
-      let recipeDoc = new Recipe(recipe);
+      const recipeDoc = new Recipe(recipe);
       return recipeDoc.save();
     });
   }

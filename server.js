@@ -4,6 +4,7 @@ const Hapi = require('hapi');
 const Inert = require('inert');
 const cookbook = require('./api/cookbook');
 const healthcheck = require('./api/healthcheck');
+const auth = require('./api/auth');
 
 /* Initialize server and routes */
 
@@ -70,6 +71,12 @@ server.route({
   method: 'GET',
   path: '/api/ready',
   handler: healthcheck.ready
+});
+
+server.route({
+  method: 'POST',
+  path: '/api/auth',
+  handler: auth.login
 });
 
 server.start((err) => {

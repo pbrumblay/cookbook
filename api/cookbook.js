@@ -33,72 +33,76 @@ function getAll (request, reply) {
     return reply(result);
 }
 
-class Cookbook  {
+function get(request, reply) {
+    const id = request.params.param;
+    if(!id) {
+        return getAll(request, reply);
+    } else {
+        const result = readModel.getRecipeById(request.params.param).then(foundRecipe => {
 
-    get(request, reply) {
-        const id = request.params.param;
-        if(!id) {
-            return getAll(request, reply);
-        } else {
-            const result = readModel.getRecipeById(request.params.param).then(foundRecipe => {
-
-                if (!foundRecipe) {
-                    return Boom.notFound('Recipe not found.');
-                }
-                return foundRecipe;
-            });
-            return reply(result);
-        }
-    }
-
-    getCategories(request, reply) {
-        reply(readModel.getDistinctCategories());
-    }
-
-    changeRecipe(request, reply) {
-        const id = request.params.param;
-        const updatedRecipe = request.payload;
-
-        const result = readModel.getRecipeById(id).then(storedRecipe => {
-            if (!storedRecipe) {
-                return Boom.notFound("Recipe ID not found.");
+            if (!foundRecipe) {
+                return Boom.notFound('Recipe not found.');
             }
-
-            const validationError = validateRecipe(updatedRecipe);
-            if(validationError) return validationError;
-
-            return writeModel.saveRecipe(id, updatedRecipe);
+            return foundRecipe;
         });
-
         return reply(result);
-    }
-
-    deleteRecipe(request, reply) {
-        const id = request.params.param;
-
-        const result = readModel.getRecipeById(id).then(storedRecipe => {
-            if (!storedRecipe) {
-                return Boom.notFound("Recipe ID not found.");
-            }
-
-            if (storedRecipe.Favorite) {
-                return Boom.badRequest("Cannot delete a favorite!");
-            }
-
-            return writeModel.deleteRecipe(id);
-        });
-
-        return reply(result);
-    }
-
-    create(request, reply) {
-        const newRecipe = request.payload;
-
-        const validationError = validateRecipe(newRecipe);
-        if(validationError) return reply(validationError);
-
-        return reply(writeModel.createRecipe(newRecipe));
     }
 }
 
-module.exports = new Cookbook();
+function getCategories(request, reply) {
+    reply(readModel.getDistinctCategories());
+}
+
+function changeRecipe(request, reply) {
+    const id = request.params.param;
+    const updatedRecipe = request.payload;
+
+    const result = readModel.getRecipeById(id).then(storedRecipe => {
+        if (!storedRecipe) {
+            return Boom.notFound("Recipe ID not found.");
+        }
+
+        const validationError = validateRecipe(updatedRecipe);
+        if(validationError) return validationError;
+
+        return writeModel.saveRecipe(id, updatedRecipe);
+    });
+
+    return reply(result);
+}
+
+function deleteRecipe(request, reply) {
+    const id = request.params.param;
+
+    const result = readModel.getRecipeById(id).then(storedRecipe => {
+        if (!storedRecipe) {
+            return Boom.notFound("Recipe ID not found.");
+        }
+
+        if (storedRecipe.Favorite) {
+            return Boom.badRequest("Cannot delete a favorite!");
+        }
+
+        return writeModel.deleteRecipe(id);
+    });
+
+    return reply(result);
+}
+
+function create(request, reply) {
+    const newRecipe = request.payload;
+
+    const validationError = validateRecipe(newRecipe);
+    if(validationError) return reply(validationError);
+
+    return reply(writeModel.createRecipe(newRecipe));
+}
+
+
+module.exports = {
+    get: get,
+    getCategories: getCategories,
+    changeRecipe: changeRecipe,
+    deleteRecipe: deleteRecipe,
+    create : create
+};

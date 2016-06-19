@@ -28,3 +28,4 @@ process.on('SIGINT', function() {
 });
 
 require('./recipe');
+require('./user');

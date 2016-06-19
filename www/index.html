@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
 <head>
+	<title ng-bind="title"></title>
     <meta charset="utf-8">
-    <title ng-bind="title"></title>
+	<meta name="google-signin-scope" content="profile email">
+	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<link href="content/app.css" rel="stylesheet"/>
 	<link href="content/xeditable.css" rel="stylesheet"/>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
-<body>
+<body id="recipeBody" ng-controller="homeController">
     <header class="navbar navbar-inverse hidden-print" role="banner">
         <div class="container">
             <div class="navbar-header">
@@ -15,9 +18,16 @@
             </div>
         </div>
     </header>
-
+	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+	<script>
+		function onSignIn(googleUser) {
+			var profile = googleUser.getBasicProfile();
+			var scope = angular.element($('#recipeBody')).scope();
+			scope.login(googleUser.getAuthResponse().id_token);
+		};
+	</script>
     <div id="ui-view" class="container">
-		<div class="container" ng-controller="homeController">
+		<div class="container">
 			<div class="col-md-6 hidden-print">
 
 				<form>
