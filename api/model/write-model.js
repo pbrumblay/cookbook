@@ -17,8 +17,6 @@ class WriteModel {
   }
 
   saveRecipe(id, newRecipe) {
-    // Update recipe by Id. Ask mongo to return the "new" representation
-    // of the document in the database.
     return Recipe.findOneAndUpdate({"Id": id}, newRecipe, {new: true});
   }
 

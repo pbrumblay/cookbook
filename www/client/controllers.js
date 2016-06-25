@@ -15,6 +15,10 @@ angular.module('app.controllers', [])
         $scope.error = null;
         $scope.currentRecipe = null;
 
+        $scope.accessLevel = null;
+        $scope.userPicture = null;
+        $scope.userName = null;
+
 
         $scope.$watch('searchText', function () {
             $scope.error = null;
@@ -36,7 +40,24 @@ angular.module('app.controllers', [])
 
         $scope.login = function(googleToken) {
             var payload = { idToken: googleToken };
-            return $http.post('/api/auth', payload);
+            $http.post('/api/auth', payload)
+                .success(function(result) {
+                    $scope.userName = result.fullName;
+                    $scope.userPicture = result.picture;
+                    if(result.isAdmin) {
+                        $scope.accessLevel = "Read/Write";
+                    } else {
+                        $scope.accessLevel = "Read Only";
+                    }
+                });
+        }
+
+        $scope.logout = function() {
+            console.log('log out');
+            $scope.accessLevel = null;
+            $scope.userName = null;
+            $scope.userPicture = null;
+            $scope.$apply();
         }
 
         $scope.addNew = function () {

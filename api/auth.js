@@ -29,40 +29,43 @@ function getContent(url) {
 };
 
 function checkUser(json) {
-    return User.findOne({ "email": json.email }).then(u => {
-        return logLogin(u, json);
-    });
+    const newU = {
+        email: json.email,
+        fullName: json.name,
+        givenName: json.given_name,
+        familyName: json.family_name,
+        picture: json.picture,
+    }
+    return User.findOneAndUpdate({ "email": json.email }, newU, { upsert: true });
 }
 
-function logLogin(u, json) {
-    let log = new UserLog();
-    log.email = json.email;
+function logLogin(u) {
+    const log = new UserLog();
+    log.email = u.email;
     log.lastLogin = new Date();
-    return log.save().then(d => {
-        return u;
-    });
+    return log.save().then(u);
 }
 
 function validateToken(idToken) {
-    let url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + idToken;
+    const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${idToken}`;
     return getContent(url)
         .then(data => {
             const json = JSON.parse(data);
-            if(json.aud !== appClientId) {
-                console.error('client ids do not match!');
-            } else {
-                checkUser(json).then(result => {
-                    return logLogin(result.json);
-                });
+            if (json.aud !== appClientId) {
+                return Boom.badRequest("Client IDs do not match!");
             }
-        });
+            return json;
+        })
+        .then(json => checkUser(json));
 }
 
 function login(request, reply) {
     if(!request.payload || !request.payload.idToken) {
         return Boom.badRequest("Bad login request.");
     }
-    return reply(validateToken(request.payload.idToken));
+    return validateToken(request.payload.idToken)
+        .then(u => reply({ isAdmin: u.isAdmin, fullName: u.fullName, picture: u.picture }))
+        .catch(e => reply(e));
 }
 
 module.exports = {

@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     givenName: String,
     familyName: String,
     imageUrl: String,
-    email: String,
+    picture: String,
+    email: { type: String, index: { unique: true } },
     isAdmin: Boolean
 });
 

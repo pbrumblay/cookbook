@@ -14,17 +14,31 @@
     <header class="navbar navbar-inverse hidden-print" role="banner">
         <div class="container">
             <div class="navbar-header">
-                <a href="./" class="navbar-brand">Recipes</a>
+                <a href="./" class="navbar-brand navbar-left">Recipes</a>
             </div>
+			<div class="nav navbar-right">
+				<a href="#" class="navbar-text" ng-show="userPicture" onclick="signOut();">Sign Out</a>
+				<img class="userImage img-circle" ng-attr-alt="{{fullName}}" ng-show="userPicture"  ng-attr-src="{{userPicture}}" />
+				<div class="g-signin2 userImage"  ng-show="!userPicture" data-onsuccess="onSignIn" data-theme="dark" data></div>
+				<div class="navbar-text" ng-show="accessLevel">{{accessLevel}}</div>
+			</div>
         </div>
     </header>
-	<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+
 	<script>
 		function onSignIn(googleUser) {
 			var profile = googleUser.getBasicProfile();
 			var scope = angular.element($('#recipeBody')).scope();
 			scope.login(googleUser.getAuthResponse().id_token);
-		};
+		}
+
+		function signOut() {
+			var auth2 = gapi.auth2.getAuthInstance();
+			auth2.signOut().then(function () {
+				var scope = angular.element($('#recipeBody')).scope();
+				scope.logout();
+			});
+		}
 	</script>
     <div id="ui-view" class="container">
 		<div class="container">
