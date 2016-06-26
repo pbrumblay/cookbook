@@ -76,11 +76,11 @@ function deleteRecipe(request, reply) {
 
     const result = readModel.getRecipeById(id).then(storedRecipe => {
         if (!storedRecipe) {
-            return Boom.notFound("Recipe ID not found.");
+            return Boom.notFound('Recipe ID not found.');
         }
 
         if (storedRecipe.Favorite) {
-            return Boom.badRequest("Cannot delete a favorite!");
+            return Boom.badRequest('Cannot delete a favorite!');
         }
 
         return writeModel.deleteRecipe(id);

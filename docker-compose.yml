@@ -8,6 +8,7 @@ server:
   environment:
    - DEBUG=true
    - APP_CLIENT_ID=538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com
+   - JWT_SECRET=tacos
   volumes:
    - .:/dist
 

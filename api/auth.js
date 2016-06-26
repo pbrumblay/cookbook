@@ -1,9 +1,11 @@
-'use strict';
-
 const User = require("./model/user");
 const UserLog = require("./model/userLog");
 const Boom = require('boom');
 const appClientId = process.env.APP_CLIENT_ID;
+const jwtSecret = process.env.JWT_SECRET;
+const jwt = require('jsonwebtoken');
+const uuid = require('uuid');
+
 
 //lifted: http://www.tomas-dvorak.cz/posts/nodejs-request-without-dependencies/
 function getContent(url) {
@@ -36,14 +38,16 @@ function checkUser(json) {
         familyName: json.family_name,
         picture: json.picture,
     }
-    return User.findOneAndUpdate({ "email": json.email }, newU, { upsert: true });
+    return User.findOneAndUpdate({ email: json.email }, newU, { upsert: true });
 }
 
 function logLogin(u) {
     const log = new UserLog();
     log.email = u.email;
     log.lastLogin = new Date();
-    return log.save().then(u);
+    log.authToken = uuid.v4();
+    u.authToken = jwt.sign(log.authToken, jwtSecret);
+    return log.save().then(() => u);
 }
 
 function validateToken(idToken) {
@@ -52,7 +56,7 @@ function validateToken(idToken) {
         .then(data => {
             const json = JSON.parse(data);
             if (json.aud !== appClientId) {
-                return Boom.badRequest("Client IDs do not match!");
+                return Boom.badRequest('Client IDs do not match!');
             }
             return json;
         })
@@ -61,13 +65,52 @@ function validateToken(idToken) {
 
 function login(request, reply) {
     if(!request.payload || !request.payload.idToken) {
-        return Boom.badRequest("Bad login request.");
+        return Boom.badRequest('Bad login request.');
     }
+
     return validateToken(request.payload.idToken)
-        .then(u => reply({ isAdmin: u.isAdmin, fullName: u.fullName, picture: u.picture }))
-        .catch(e => reply(e));
+        .then(u => logLogin(u))
+        .then(u => reply({ isAdmin: u.isAdmin, fullName: u.fullName, picture: u.picture, authToken: u.authToken }))
+        .catch(e => {
+            console.log(e);
+            reply(e)
+        });
+}
+
+function isValidUser(decoded, request, callback) {
+    UserLog.findOne({ authToken: decoded })
+        .then(log => {
+            if(!log) {
+                callback(Boom.unauthorized('Token not found', false))
+            }
+            return log;
+        })
+        .then(log => User.findOne({ email: log.email }))
+        .then(u => {
+            callback(null, true, u)
+        });
+}
+
+function isAdminUser(decoded, request, callback) {
+    UserLog.findOne({ authToken: decoded })
+        .then(log => {
+            if(!log) {
+                callback(Boom.unauthorized('Token not found', false))
+            }
+            return log;
+        })
+        .then(log => User.findOne({ email: log.email }))
+        .then(u => {
+            if(!u.isAdmin) {
+                callback(Boom.unauthorized('Admin access required.', false));
+            } else {
+                callback(null, true, u)
+            }
+        });
 }
 
 module.exports = {
-    login: login
+    login,
+    isValidUser,
+    isAdminUser,
 }

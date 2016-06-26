@@ -12,10 +12,13 @@
   },
   "dependencies": {
     "hapi": "^13.3.0",
+    "hapi-auth-jwt2": "^7.0.1",
     "inert": "^3.2.0",
+    "jsonwebtoken": "^7.0.1",
     "mongodb": "^2.0.52",
     "mongoose": "^4.3.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "uuid": "^2.0.2"
   },
   "devDependencies": {
     "proxyquire": "^1.7.9",

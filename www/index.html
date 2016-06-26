@@ -40,7 +40,7 @@
 			});
 		}
 	</script>
-    <div id="ui-view" class="container">
+    <div id="ui-view" class="container" ng-show="userName">
 		<div class="container">
 			<div class="col-md-6 hidden-print">
 
@@ -127,6 +127,11 @@
 			</div>
 		</div>
     </div>
+	<div id="not-logged-in" class="container" ng-show="!userName">
+		<div class="col-md-6 hidden-print alert alert-danger">
+			<strong>Please sign in.</strong>
+		</div>
+	</div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>

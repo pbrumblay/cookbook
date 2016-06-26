@@ -3,7 +3,7 @@
 angular.module('app.controllers', [])
 
     // Path: /
-    .controller('homeController', ['$scope', '$filter', '$http', 'searchSvc', 'getSvc', 'getCategoriesSvc', 'saveRecipeSvc', function ($scope, $filter, $http, searchSvc, getSvc, getCategoriesSvc,  saveRecipeSvc) {
+    .controller('homeController', ['$scope', '$filter', '$http', '$window', 'searchSvc', 'getSvc', 'getCategoriesSvc', 'saveRecipeSvc', function ($scope, $filter, $http, $window, searchSvc, getSvc, getCategoriesSvc,  saveRecipeSvc) {
         $scope.$root.title = 'Recipes';
 
         $scope.showSuccess = false;
@@ -42,6 +42,7 @@ angular.module('app.controllers', [])
             var payload = { idToken: googleToken };
             $http.post('/api/auth', payload)
                 .success(function(result) {
+                    $window.sessionStorage.token = result.authToken;
                     $scope.userName = result.fullName;
                     $scope.userPicture = result.picture;
                     if(result.isAdmin) {
@@ -53,10 +54,10 @@ angular.module('app.controllers', [])
         }
 
         $scope.logout = function() {
-            console.log('log out');
             $scope.accessLevel = null;
             $scope.userName = null;
             $scope.userPicture = null;
+            $window.sessionStorage.token = null;
             $scope.$apply();
         }
 
