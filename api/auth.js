@@ -1,5 +1,5 @@
 const User = require("./model/user");
-const UserLog = require("./model/userLog");
+const UserLog = require("./model/user-log");
 const Boom = require('boom');
 const appClientId = process.env.APP_CLIENT_ID;
 const jwtSecret = process.env.JWT_SECRET;
@@ -31,23 +31,22 @@ function getContent(url) {
 };
 
 function checkUser(json) {
-    const newU = {
-        email: json.email,
-        fullName: json.name,
-        givenName: json.given_name,
-        familyName: json.family_name,
-        picture: json.picture,
-    }
-    return User.findOneAndUpdate({ email: json.email }, newU, { upsert: true });
+    const u = new User(json.email,json.name,json.given_name,json.family_name,json.picture);
+    console.log(json);
+    console.log(u.email);
+    console.log(u.fullName);
+    console.log(u.givenName);
+    console.log(u.familyName);
+    console.log(u.picture);
+    return u.upsert();
 }
 
 function logLogin(u) {
-    const log = new UserLog();
-    log.email = u.email;
-    log.lastLogin = new Date();
-    log.authToken = uuid.v4();
-    u.authToken = jwt.sign(log.authToken, jwtSecret);
-    return log.save().then(() => u);
+    console.log('### logLogin')
+    console.log(u);
+    const authToken = jwt.sign(uuid.v4(), jwtSecret);
+    const log = new UserLog(u.email, new Date(), authToken);
+    return log.save();
 }
 
 function validateToken(idToken) {
@@ -68,9 +67,17 @@ function login(request, reply) {
         return Boom.badRequest('Bad login request.');
     }
 
+    let user;
     return validateToken(request.payload.idToken)
-        .then(u => logLogin(u))
-        .then(u => reply({ isAdmin: u.isAdmin, fullName: u.fullName, picture: u.picture, authToken: u.authToken }))
+        .then(u => {
+            user = u;
+            return logLogin(u);
+        })
+        .then(l => {
+            console.log('LOG::::');
+            console.log(l);
+            reply({ isAdmin: user.isAdmin, fullName: user.fullName, picture: user.picture, authToken: l.authToken })
+        })
         .catch(e => {
             console.log(e);
             reply(e)
@@ -78,28 +85,28 @@ function login(request, reply) {
 }
 
 function isValidUser(decoded, request, callback) {
-    UserLog.findOne({ authToken: decoded })
+    UserLog.find(decoded)
         .then(log => {
             if(!log) {
                 callback(Boom.unauthorized('Token not found', false))
             }
             return log;
         })
-        .then(log => User.findOne({ email: log.email }))
+        .then(log => User.find(log.email))
         .then(u => {
-            callback(null, true, u)
+            callback(null, true, u);
         });
 }
 
 function isAdminUser(decoded, request, callback) {
-    UserLog.findOne({ authToken: decoded })
+    UserLog.find(decoded)
         .then(log => {
             if(!log) {
                 callback(Boom.unauthorized('Token not found', false))
             }
             return log;
         })
-        .then(log => User.findOne({ email: log.email }))
+        .then(log => User.find(log.email))
         .then(u => {
             if(!u.isAdmin) {
                 callback(Boom.unauthorized('Admin access required.', false));

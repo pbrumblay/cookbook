@@ -38,12 +38,12 @@ function get(request, reply) {
     if(!id) {
         return getAll(request, reply);
     } else {
-        const result = readModel.getRecipeById(request.params.param).then(foundRecipe => {
+        const result = readModel.getRecipeById(request.params.param).then(result => {
 
-            if (!foundRecipe) {
+            if (!result) {
                 return Boom.notFound('Recipe not found.');
             }
-            return foundRecipe;
+            return result;
         });
         return reply(result);
     }
@@ -57,8 +57,8 @@ function changeRecipe(request, reply) {
     const id = request.params.param;
     const updatedRecipe = request.payload;
 
-    const result = readModel.getRecipeById(id).then(storedRecipe => {
-        if (!storedRecipe) {
+    const result = readModel.getRecipeById(id).then(result => {
+        if (!result) {
             return Boom.notFound("Recipe ID not found.");
         }
 
@@ -74,12 +74,12 @@ function changeRecipe(request, reply) {
 function deleteRecipe(request, reply) {
     const id = request.params.param;
 
-    const result = readModel.getRecipeById(id).then(storedRecipe => {
-        if (!storedRecipe) {
+    const result = readModel.getRecipeById(id).then(result => {
+        if (!result) {
             return Boom.notFound('Recipe ID not found.');
         }
 
-        if (storedRecipe.Favorite) {
+        if (result.Favorite) {
             return Boom.badRequest('Cannot delete a favorite!');
         }
 

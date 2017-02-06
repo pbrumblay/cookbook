@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cookbook
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: cookbook
+    spec:
+      containers:
+        - name: cookbook
+          imagePullPolicy: Always
+          image: "gcr.io/cookbook-1180/cookbook"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: 250m
+              memory: "150Mi"
+          volumeMounts:
+            - name: "dscreds"
+              mountPath: "/home/node/creds"
+              readOnly: true
+    volumes:
+      - name: "dscreds"
+        secret:
+          secretName: "dscreds"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "cookbook"
+spec:
+  selector:
+    app: "cookbook"
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+  sessionAffinity: None

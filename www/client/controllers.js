@@ -42,6 +42,7 @@ angular.module('app.controllers', [])
             var payload = { idToken: googleToken };
             $http.post('/api/auth', payload)
                 .success(function(result) {
+                    console.log(result);
                     $window.sessionStorage.token = result.authToken;
                     $scope.userName = result.fullName;
                     $scope.userPicture = result.picture;

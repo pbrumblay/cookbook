@@ -11,6 +11,7 @@
     "test": "node tests/cookbook.js"
   },
   "dependencies": {
+    "@google-cloud/datastore": "^0.7.0",
     "hapi": "^13.3.0",
     "hapi-auth-jwt2": "^7.0.1",
     "inert": "^3.2.0",

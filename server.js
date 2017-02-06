@@ -18,7 +18,9 @@ const server = new Hapi.Server({
     }
   }
 });
-server.connection({ port: 80 });
+const serverPort = 8080;
+console.log(`Starting server on ${serverPort}`)
+server.connection({ port: serverPort });
 
 server.register(Inert, () => {});
 

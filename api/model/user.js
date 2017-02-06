@@ -1,15 +1,81 @@
-'use strict';
-
-const mongoose = require('mongoose');
-
-const userSchema = new mongoose.Schema({
-    fullName: String,
-    givenName: String,
-    familyName: String,
-    imageUrl: String,
-    picture: String,
-    email: { type: String, index: { unique: true } },
-    isAdmin: Boolean
+const Datastore = require('@google-cloud/datastore');
+const datastore = Datastore({
+    projectId: 'cookbook-1180'
 });
 
-module.exports = mongoose.model('User', userSchema, 'users');
+const USER = 'User';
+
+class User {
+    constructor(email, fullName, givenName, familyName, picture) {
+        this.email = email;
+        this.fullName = fullName;
+        this.givenName = givenName;
+        this.familyName = familyName;
+        this.picture = picture;
+    }
+
+    save() {
+        const key = datastore.key([USER, this.email]);
+        const dbUser = {
+            key: key,
+            data: [
+                {
+                    name: 'email',
+                    value: this.email,
+                },
+                {
+                    name: 'fullName',
+                    value: this.fullName,
+                },
+                {
+                    name: 'givenName',
+                    value: this.givenName,
+                },
+                {
+                    name: 'familyName',
+                    value: this.familyName,
+                },
+                {
+                    name: 'picture',
+                    value: this.picture,
+                },
+                {
+                    name: 'isAdmin',
+                    value: false,
+                },
+
+            ]
+        }
+
+        return datastore.upsert(dbUser).then(r => {
+            console.log(`User Saved ${this.email}`);
+            return this;
+        });
+    }
+
+    upsert() {
+        return User.find(this.email).then(u => {
+            if(u != null) {
+                const user = new User(u.email, u.fullName, u.givenName, u.familyName, u.picture);
+                return user.save();
+            } else {
+                return this.save();
+            }
+        })
+    }
+
+    static find(email) {
+        const query = datastore.createQuery(USER)
+            .filter('email', '=', email);
+
+        return datastore.runQuery(query).then(r => {
+            if(r.length && r[0] && r[0].length) {
+                return r[0][0];
+            } else {
+                return null;
+            }
+        });
+    }
+}
+
+module.exports = User;

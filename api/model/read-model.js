@@ -1,32 +1,61 @@
-'use strict';
-
-var db = require('./db');
-var mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
-
-var Recipe = mongoose.model('Recipe');
+const Datastore = require('@google-cloud/datastore');
+const datastore = Datastore({
+    projectId: 'cookbook-1180'
+});
+const RECIPE = 'Recipe';
 
 class ReadModel {
-  getAll(searchFilter) {
-    if(searchFilter) {
-      let regex = new RegExp(searchFilter, "i")
-      return Recipe.find(
-          {
-            $or: [ { Name: regex}, { Description: regex}, { IngredientsSearchText: regex} ]
-          }).sort({ Name: 1});
+    getRecipes(searchFilter) {
+        const query = datastore.createQuery(RECIPE)
+            .order('Name');
+
+        return datastore.runQuery(query).then(results => {
+            if(searchFilter && typeof searchFilter === 'string') {
+                const lowerFilter = searchFilter.toLowerCase();
+                const filteredResults = [];
+                results[0].forEach(r => {
+
+                    const searchStr = `${r.Name} ${r.Description} ${r.CategoryName} ${r.IngredientsSearchText}`.toLowerCase();
+
+                    if(searchStr.toLowerCase().includes(lowerFilter)) {
+                        filteredResults.push(r);
+                    }
+                });
+                return filteredResults;
+            } else {
+                return results[0];
+            }
+        });
     }
-    return Recipe.find().sort({ Name: 1});
-  }
 
-  getRecipeById(id) {
-    return Recipe.findOne({ "Id": id });
-  }
+    getRecipeById(id) {
+        const key = datastore.key([RECIPE, id]);
+        return datastore.get(key).then(results => {
+            if(!results || results.length === 0) {
+                return null;
+            } else {
+                return results[0];
+            }
+        });
+    }
 
-  getDistinctCategories() {
-    return Recipe.find().distinct("CategoryName").then(f => {
-      return f.sort();
-    });
-  }
+    getDistinctCategories() {
+        const categoryNames = [];
+
+        const query = datastore.createQuery(RECIPE)
+            .select(['CategoryName'])
+            .groupBy('CategoryName')
+            .order('CategoryName');
+
+        return datastore.runQuery(query)
+            .then(results => {
+                const catNames = results[0];
+                catNames.forEach(cat => {
+                    categoryNames.push(cat.CategoryName);
+                })
+                return categoryNames;
+            });
+    }
 }
 
 module.exports = ReadModel;
