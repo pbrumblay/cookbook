@@ -46,13 +46,17 @@ class UserLog {
     }
 
     static find(authToken) {
+        console.log(`authToken ${authToken}`);
         const query = datastore.createQuery(USERLOG)
                 .filter('authToken', '=', authToken);
 
         return datastore.runQuery(query).then(r => {
             if(r.length && r[0] && r[0].length) {
+                console.log('logging ... query result');
+                console.log(r[0][0]);
                 return r[0][0];
             } else {
+                console.log(`returning null. query not found. ${query}`);
                 return null;
             }
         });

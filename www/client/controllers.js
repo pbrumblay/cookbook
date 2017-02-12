@@ -26,6 +26,7 @@ angular.module('app.controllers', [])
         });
 
         function doSearch() {
+            $scope.error = null;
             if ($scope.searchText) {
                 searchSvc.async($scope.searchText).then(
                     function (data) {
@@ -40,6 +41,7 @@ angular.module('app.controllers', [])
 
         $scope.login = function(googleToken) {
             var payload = { idToken: googleToken };
+            $scope.error = null;
             $http.post('/api/auth', payload)
                 .success(function(result) {
                     console.log(result);
@@ -55,6 +57,7 @@ angular.module('app.controllers', [])
         }
 
         $scope.logout = function() {
+            $scope.error = null;
             $scope.accessLevel = null;
             $scope.userName = null;
             $scope.userPicture = null;
@@ -63,6 +66,7 @@ angular.module('app.controllers', [])
         }
 
         $scope.addNew = function () {
+            $scope.error = null;
             $scope.currentRecipe = {
                 "Id": 0,
                 "Name": "",
@@ -89,6 +93,7 @@ angular.module('app.controllers', [])
         };
 
         $scope.saveRecipe = function() {
+            $scope.error = null;
             for (let i = $scope.currentRecipe.Ingredients.length; i--;) {
                 let r = $scope.currentRecipe.Ingredients[i];
                 if (r.isDeleted) {
@@ -113,6 +118,7 @@ angular.module('app.controllers', [])
 
         $scope.categories = [];
         $scope.loadCategories = function() {
+            $scope.error = null;
             return getCategoriesSvc.async().then(
                 function(data) {
                     $scope.categories = data;

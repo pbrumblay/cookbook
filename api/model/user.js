@@ -12,6 +12,7 @@ class User {
         this.givenName = givenName;
         this.familyName = familyName;
         this.picture = picture;
+        this.isAdmin = false;
     }
 
     save() {
@@ -41,7 +42,7 @@ class User {
                 },
                 {
                     name: 'isAdmin',
-                    value: false,
+                    value: this.isAdmin,
                 },
 
             ]
@@ -56,11 +57,9 @@ class User {
     upsert() {
         return User.find(this.email).then(u => {
             if(u != null) {
-                const user = new User(u.email, u.fullName, u.givenName, u.familyName, u.picture);
-                return user.save();
-            } else {
-                return this.save();
+                this.isAdmin = u.isAdmin;
             }
+            return this.save();
         })
     }
 

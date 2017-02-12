@@ -44,8 +44,7 @@ function checkUser(json) {
 function logLogin(u) {
     console.log('### logLogin')
     console.log(u);
-    const authToken = jwt.sign(uuid.v4(), jwtSecret);
-    const log = new UserLog(u.email, new Date(), authToken);
+    const log = new UserLog(u.email, new Date(), uuid.v4());
     return log.save();
 }
 
@@ -76,7 +75,8 @@ function login(request, reply) {
         .then(l => {
             console.log('LOG::::');
             console.log(l);
-            reply({ isAdmin: user.isAdmin, fullName: user.fullName, picture: user.picture, authToken: l.authToken })
+            const encodedToken = jwt.sign(l.authToken, jwtSecret);
+            reply({ isAdmin: user.isAdmin, fullName: user.fullName, picture: user.picture, authToken: encodedToken })
         })
         .catch(e => {
             console.log(e);
@@ -85,20 +85,31 @@ function login(request, reply) {
 }
 
 function isValidUser(decoded, request, callback) {
+    console.log(`Checking valid user: ${decoded}`);
     UserLog.find(decoded)
         .then(log => {
             if(!log) {
                 callback(Boom.unauthorized('Token not found', false))
             }
+            console.log('logging log');
+            console.log(log);
             return log;
         })
-        .then(log => User.find(log.email))
+        .then(log => {
+            console.log('logging log');
+            console.log(log);
+            User.find(log.email)
+        })
         .then(u => {
             callback(null, true, u);
+        })
+        .catch(e => {
+            console.log(e);
         });
 }
 
 function isAdminUser(decoded, request, callback) {
+    console.log(`Checking admin: ${decoded}`);
     UserLog.find(decoded)
         .then(log => {
             if(!log) {
@@ -108,11 +119,14 @@ function isAdminUser(decoded, request, callback) {
         })
         .then(log => User.find(log.email))
         .then(u => {
+            console.log(u);
             if(!u.isAdmin) {
                 callback(Boom.unauthorized('Admin access required.', false));
             } else {
                 callback(null, true, u)
             }
+        }).catch(e => {
+            console.log(e);
         });
 }
 

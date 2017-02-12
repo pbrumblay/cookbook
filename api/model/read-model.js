@@ -8,6 +8,7 @@ class ReadModel {
     getRecipes(searchFilter) {
         const query = datastore.createQuery(RECIPE)
             .order('Name');
+        console.log('Searching ... ');
 
         return datastore.runQuery(query).then(results => {
             if(searchFilter && typeof searchFilter === 'string') {

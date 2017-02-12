@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon -L server.js",
-    "debug": "nodemon --debug -L server.js",
-    "debug-brk": "nodemon --debug-brk -L server.js",
+    "debug": "nodemon --trace-warnings --debug -L server.js",
+    "debug-brk": "nodemon --trace-warnings --debug-brk -L server.js",
     "test": "node tests/cookbook.js"
   },
   "dependencies": {

@@ -7,17 +7,16 @@ const RECIPE = 'Recipe';
 class WriteModel {
     createRecipe(newRecipe) {
         const key = datastore.key([RECIPE]);
-
-        return datastore.allocateIds(key, 1).then(response => {
-            newRecipe.Id = response[0][0].id;
-            const dsRecipe = {
-                key: response[0][0],
-                data: this.convertToExplicit(newRecipe),
-            }
-            return datastore.insert(dsRecipe).then(r => {
-                console.log(`Created ${dsRecipe.key.id} : ${newRecipe.Name}`);
-                return newRecipe;
-            });
+        const dsRecipe = {
+            key: key,
+            data: this.convertToExplicit(newRecipe),
+        }
+        return datastore.insert(dsRecipe).then(r => {
+            console.log(`Created ${dsRecipe.key.id} : ${newRecipe.Name}`);
+            newRecipe.Id = dsRecipe.key.id;
+            return newRecipe;
+        }).catch(e => {
+            console.error(e);
         });
     }
 
@@ -31,7 +30,9 @@ class WriteModel {
         return datastore.upsert(dsRecipe).then(r => {
             console.log(`Saved ${dsRecipe.key.id} : ${newRecipe.Name}`);
             return newRecipe;
-        });
+        }).catch(e => {
+            console.error(e);
+        });;
     }
 
     deleteRecipe(id) {
@@ -39,7 +40,9 @@ class WriteModel {
 
         return datastore.delete(key).then(r => {
             console.log(`Deleted ${id}`);
-        });
+        }).catch(e => {
+            console.error(e);
+        });;
     }
 
     convertToExplicit(recipe) {
