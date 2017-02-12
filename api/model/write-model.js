@@ -5,22 +5,44 @@ const datastore = Datastore({
 const RECIPE = 'Recipe';
 
 class WriteModel {
-    createRecipe(newRecipe) {
-        const key = datastore.key([RECIPE]);
-        const dsRecipe = {
-            key: key,
-            data: this.convertToExplicit(newRecipe),
+
+    setDefaults(recipe) {
+        recipe.Favorite = !!recipe.Favorite;
+        if(recipe.Visible !== false) {
+            recipe.Visible = true;
         }
-        return datastore.insert(dsRecipe).then(r => {
-            console.log(`Created ${dsRecipe.key.id} : ${newRecipe.Name}`);
-            newRecipe.Id = dsRecipe.key.id;
-            return newRecipe;
-        }).catch(e => {
-            console.error(e);
+        recipe.Source = recipe.Source ? recipe.Source + '' : '';
+        recipe.Instructions = recipe.Instructions ? recipe.Instructions + '' : '';
+        recipe.Description = recipe.Description ? recipe.Description + '' : '';
+
+        recipe.IngredientsSearchText = '';
+        let delim = '';
+        recipe.Ingredients.forEach(ing => {
+            recipe.IngredientsSearchText += (delim + ing.Name);
+            delim = ' ';
+        });
+    }
+
+    createRecipe(newRecipe) {
+        this.setDefaults(newRecipe);
+        const key = datastore.key([RECIPE]);
+
+        return datastore.allocateIds(key, 1).then(response => {
+            newRecipe.Id = response[0][0].id;
+            console.log(`new id: ${newRecipe.Id}`);
+            const dsRecipe = {
+                key: response[0][0],
+                data: this.convertToExplicit(newRecipe),
+            }
+            return datastore.insert(dsRecipe).then(r => {
+                console.log(`Created ${dsRecipe.key.id} : ${newRecipe.Name}`);
+                return newRecipe;
+            });
         });
     }
 
     saveRecipe(id, newRecipe) {
+        this.setDefaults(newRecipe);
         const key = datastore.key([RECIPE, id]);
 
         const dsRecipe = {

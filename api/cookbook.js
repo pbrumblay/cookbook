@@ -17,6 +17,8 @@ function validateRecipe(recipe) {
         return Boom.badRequest("Recipe name is required.");
     } else if (!recipe.Ingredients || recipe.Ingredients.length === 0) {
         return Boom.badRequest("Ingredients are required.");
+    } else if (!recipe.CategoryName || recipe.CategoryName.length === 0) {
+        return Boom.badRequest("Category name is required.");
     }
     return null;
 }
