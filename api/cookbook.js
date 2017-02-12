@@ -11,8 +11,6 @@ const writeModel = new WriteModel();
  * Validates recipe input for required name and ingredients.
  */
 function validateRecipe(recipe) {
-    console.log('validating');
-    console.log(recipe);
     if (!recipe.Name || recipe.Name.length === 0) {
         return Boom.badRequest("Recipe name is required.");
     } else if (!recipe.Ingredients || recipe.Ingredients.length === 0) {
@@ -43,7 +41,6 @@ function get(request, reply) {
         return getAll(request, reply);
     } else {
         id = parseInt(id);
-        console.log(`Recipe id: ${id}`);
         const result = readModel.getRecipeById(id).then(result => {
 
             if (!result) {
@@ -97,8 +94,6 @@ function deleteRecipe(request, reply) {
 
 function create(request, reply) {
     const newRecipe = request.payload;
-    console.log('Creating...');
-    console.log(request.payload);
 
     const validationError = validateRecipe(newRecipe);
     if(validationError) return reply(validationError);

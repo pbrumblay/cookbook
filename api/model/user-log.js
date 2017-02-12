@@ -10,16 +10,9 @@ class UserLog {
         this.email = email;
         this.lastLogin = lastLogin;
         this.authToken = authToken;
-
-        console.log(this.email);
-        console.log(this.lastLogin);
-        console.log(this.authToken);
     }
 
     save() {
-        console.log(this.email);
-        console.log(this.lastLogin);
-        console.log(this.authToken);
         const key = datastore.key([USERLOG, this.authToken]);
         const dbUserLog = {
             key: key,
@@ -46,17 +39,14 @@ class UserLog {
     }
 
     static find(authToken) {
-        console.log(`authToken ${authToken}`);
         const query = datastore.createQuery(USERLOG)
                 .filter('authToken', '=', authToken);
 
         return datastore.runQuery(query).then(r => {
             if(r.length && r[0] && r[0].length) {
-                console.log('logging ... query result');
-                console.log(r[0][0]);
                 return r[0][0];
             } else {
-                console.log(`returning null. query not found. ${query}`);
+                console.log(`Returning null. Not found. ${query}`);
                 return null;
             }
         });

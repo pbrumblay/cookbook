@@ -29,7 +29,6 @@ class WriteModel {
 
         return datastore.allocateIds(key, 1).then(response => {
             newRecipe.Id = response[0][0].id;
-            console.log(`new id: ${newRecipe.Id}`);
             const dsRecipe = {
                 key: response[0][0],
                 data: this.convertToExplicit(newRecipe),

@@ -19,7 +19,7 @@
 			<div class="nav navbar-right">
 				<a href="#" class="navbar-text" ng-show="userPicture" onclick="signOut();">Sign Out</a>
 				<img class="userImage img-circle" ng-attr-alt="{{fullName}}" ng-show="userPicture"  ng-attr-src="{{userPicture}}" />
-				<div class="g-signin2 userImage"  ng-show="!userPicture" data-onsuccess="onSignIn" data-theme="dark" data></div>
+				<div class="g-signin2 userImage"  ng-show="loginState == 'loggedOut'" data-onsuccess="onSignIn" data-theme="dark" data></div>
 				<div class="navbar-text" ng-show="accessLevel">{{accessLevel}}</div>
 			</div>
         </div>
@@ -40,7 +40,7 @@
 			});
 		}
 	</script>
-    <div id="ui-view" class="container" ng-show="userName">
+    <div id="ui-view" class="container" ng-show="loginState == 'loggedIn'">
 		<div class="container">
 			<div class="col-md-6 hidden-print">
 
@@ -127,9 +127,14 @@
 			</div>
 		</div>
     </div>
-	<div id="not-logged-in" class="container" ng-show="!userName">
+	<div id="not-logged-in" class="container" ng-show="loginState == 'loggedOut'">
 		<div class="col-md-6 hidden-print alert alert-danger">
 			<strong>Please sign in.</strong>
+		</div>
+	</div>
+	<div id="not-logged-in" class="container" ng-show="loginState == 'unknown'">
+		<div class="col-md-6 hidden-print alert alert-danger">
+			<strong>Checking account ...</strong>
 		</div>
 	</div>
 	<script src="client/jquery-2.2.4.min.js" ></script>

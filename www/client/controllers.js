@@ -18,6 +18,7 @@ angular.module('app.controllers', [])
         $scope.accessLevel = null;
         $scope.userPicture = null;
         $scope.userName = null;
+        $scope.loginState = 'unknown';
 
 
         $scope.$watch('searchText', function () {
@@ -44,7 +45,7 @@ angular.module('app.controllers', [])
             $scope.error = null;
             $http.post('/api/auth', payload)
                 .success(function(result) {
-                    console.log(result);
+                    $scope.loginState = 'loggedIn';
                     $window.sessionStorage.token = result.authToken;
                     $scope.userName = result.fullName;
                     $scope.userPicture = result.picture;
@@ -57,6 +58,7 @@ angular.module('app.controllers', [])
         }
 
         $scope.logout = function() {
+            $scope.loginState = 'loggedOut';
             $scope.error = null;
             $scope.accessLevel = null;
             $scope.userName = null;
