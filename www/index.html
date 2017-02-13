@@ -3,9 +3,8 @@
 <head>
 	<title ng-bind="title"></title>
     <meta charset="utf-8">
-	<meta name="google-signin-scope" content="profile email">
-	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
 	<link href="content/app.css" rel="stylesheet"/>
 	<link href="content/xeditable.css" rel="stylesheet"/>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -26,16 +25,31 @@
     </header>
 
 	<script>
-		function onSignIn(googleUser) {
+		window.onload = function() {
+		    console.log('onload');
+		    var scope = angular.element($('#recipeBody')).scope();
+            var auth2 = gapi.auth2.getAuthInstance();
+            if(!auth2.isSignedIn.get()) {
+                console.log('logging out from onload');
+                scope.logout();
+            } else {
+                console.log('logged in from onload');
+			}
+		};
+
+        function onSignIn(googleUser) {
+            console.log('onSignIn');
+            var scope = angular.element($('#recipeBody')).scope();
 			var profile = googleUser.getBasicProfile();
-			var scope = angular.element($('#recipeBody')).scope();
 			scope.login(googleUser.getAuthResponse().id_token);
 		}
 
 		function signOut() {
-			var auth2 = gapi.auth2.getAuthInstance();
+            console.log('signOut');
+            var scope = angular.element($('#recipeBody')).scope();
+            var auth2 = gapi.auth2.getAuthInstance();
 			auth2.signOut().then(function () {
-				var scope = angular.element($('#recipeBody')).scope();
+			    console.log('logging out from signOut');
 				scope.logout();
 			});
 		}

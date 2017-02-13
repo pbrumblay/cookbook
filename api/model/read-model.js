@@ -1,7 +1,5 @@
 const Datastore = require('@google-cloud/datastore');
-const datastore = Datastore({
-    projectId: 'cookbook-1180'
-});
+const datastore = Datastore();
 const RECIPE = 'Recipe';
 
 class ReadModel {

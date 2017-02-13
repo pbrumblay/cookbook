@@ -1,5 +1,5 @@
 server:
-  image: cookbook
+  image: cookbook:1.0.8
   ports:
    - "8080:8080"
    - "5858:5858"

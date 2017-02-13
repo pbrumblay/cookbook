@@ -1,7 +1,5 @@
 const Datastore = require('@google-cloud/datastore');
-const datastore = Datastore({
-    projectId: 'cookbook-1180'
-});
+const datastore = Datastore();
 const USERLOG = 'UserLog';
 const USER = 'User';
 

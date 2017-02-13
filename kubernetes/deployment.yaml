@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: cookbook
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -12,22 +12,31 @@ spec:
       containers:
         - name: cookbook
           imagePullPolicy: Always
-          image: "gcr.io/cookbook-1180/cookbook"
+          image: "gcr.io/cookbook-1180/cookbook:1.0.1"
           ports:
             - name: http
               containerPort: 8080
-          resources:
-            limits:
-              cpu: 250m
-              memory: "150Mi"
+          env:
+            - name: DEBUG
+              value: "false"
+            - name: APP_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cookbook-creds
+                  key: appClientId
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cookbook-creds
+                  key: jwtSecret
           volumeMounts:
             - name: "dscreds"
               mountPath: "/home/node/creds"
               readOnly: true
-    volumes:
-      - name: "dscreds"
-        secret:
-          secretName: "dscreds"
+      volumes:
+        - name: "dscreds"
+          secret:
+            secretName: "dscreds"
 ---
 apiVersion: v1
 kind: Service
@@ -41,4 +50,5 @@ spec:
       port: 80
       targetPort: 8080
   type: LoadBalancer
+  loadBalancerIP: 104.197.138.202
   sessionAffinity: None

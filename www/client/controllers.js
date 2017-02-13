@@ -20,7 +20,6 @@ angular.module('app.controllers', [])
         $scope.userName = null;
         $scope.loginState = 'unknown';
 
-
         $scope.$watch('searchText', function () {
             $scope.error = null;
             doSearch();
