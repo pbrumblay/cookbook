@@ -12,7 +12,7 @@ spec:
       containers:
         - name: cookbook
           imagePullPolicy: Always
-          image: "gcr.io/cookbook-1180/cookbook:1.0.1"
+          image: "gcr.io/cookbook-1180/cookbook:1.0.8"
           ports:
             - name: http
               containerPort: 8080
