@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:latest     
 RUN npm install nodemon -g
 
 COPY package.json /tmp/package.json
