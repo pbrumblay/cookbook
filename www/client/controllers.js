@@ -18,7 +18,7 @@ angular.module('app.controllers', [])
         $scope.accessLevel = null;
         $scope.userPicture = null;
         $scope.userName = null;
-
+        $scope.loginState = 'unknown';
 
         $scope.$watch('searchText', function () {
             $scope.error = null;
@@ -26,6 +26,7 @@ angular.module('app.controllers', [])
         });
 
         function doSearch() {
+            $scope.error = null;
             if ($scope.searchText) {
                 searchSvc.async($scope.searchText).then(
                     function (data) {
@@ -40,8 +41,10 @@ angular.module('app.controllers', [])
 
         $scope.login = function(googleToken) {
             var payload = { idToken: googleToken };
+            $scope.error = null;
             $http.post('/api/auth', payload)
                 .success(function(result) {
+                    $scope.loginState = 'loggedIn';
                     $window.sessionStorage.token = result.authToken;
                     $scope.userName = result.fullName;
                     $scope.userPicture = result.picture;
@@ -54,6 +57,8 @@ angular.module('app.controllers', [])
         }
 
         $scope.logout = function() {
+            $scope.loginState = 'loggedOut';
+            $scope.error = null;
             $scope.accessLevel = null;
             $scope.userName = null;
             $scope.userPicture = null;
@@ -62,6 +67,7 @@ angular.module('app.controllers', [])
         }
 
         $scope.addNew = function () {
+            $scope.error = null;
             $scope.currentRecipe = {
                 "Id": 0,
                 "Name": "",
@@ -88,6 +94,7 @@ angular.module('app.controllers', [])
         };
 
         $scope.saveRecipe = function() {
+            $scope.error = null;
             for (let i = $scope.currentRecipe.Ingredients.length; i--;) {
                 let r = $scope.currentRecipe.Ingredients[i];
                 if (r.isDeleted) {
@@ -112,6 +119,7 @@ angular.module('app.controllers', [])
 
         $scope.categories = [];
         $scope.loadCategories = function() {
+            $scope.error = null;
             return getCategoriesSvc.async().then(
                 function(data) {
                     $scope.categories = data;

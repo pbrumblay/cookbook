@@ -18,14 +18,16 @@ const server = new Hapi.Server({
     }
   }
 });
-server.connection({ port: 80 });
+const serverPort = 8080;
+console.log(`Starting server on ${serverPort}`)
+server.connection({ port: serverPort });
 
 server.register(Inert, () => {});
 
 server.register(require('hapi-auth-jwt2'), function (err) {
 
   if (err) {
-    console.log(err);
+    console.error(err);
   }
 
   server.auth.strategy('jwt', 'jwt',

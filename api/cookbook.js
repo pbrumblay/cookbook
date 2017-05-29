@@ -15,6 +15,8 @@ function validateRecipe(recipe) {
         return Boom.badRequest("Recipe name is required.");
     } else if (!recipe.Ingredients || recipe.Ingredients.length === 0) {
         return Boom.badRequest("Ingredients are required.");
+    } else if (!recipe.CategoryName || recipe.CategoryName.length === 0) {
+        return Boom.badRequest("Category name is required.");
     }
     return null;
 }
@@ -25,7 +27,7 @@ function isVisible(recipe) {
 
 function getAll (request, reply) {
     const searchFilter = request.query.searchText;
-    const result = readModel.getAll(searchFilter).then(
+    const result = readModel.getRecipes(searchFilter).then(
         foundRecipes => {
             return foundRecipes.filter(isVisible);
         }
@@ -34,16 +36,17 @@ function getAll (request, reply) {
 }
 
 function get(request, reply) {
-    const id = request.params.param;
+    let id = request.params.param;
     if(!id) {
         return getAll(request, reply);
     } else {
-        const result = readModel.getRecipeById(request.params.param).then(foundRecipe => {
+        id = parseInt(id);
+        const result = readModel.getRecipeById(id).then(result => {
 
-            if (!foundRecipe) {
+            if (!result) {
                 return Boom.notFound('Recipe not found.');
             }
-            return foundRecipe;
+            return result;
         });
         return reply(result);
     }
@@ -54,11 +57,11 @@ function getCategories(request, reply) {
 }
 
 function changeRecipe(request, reply) {
-    const id = request.params.param;
+    const id = parseInt(request.params.param);
     const updatedRecipe = request.payload;
 
-    const result = readModel.getRecipeById(id).then(storedRecipe => {
-        if (!storedRecipe) {
+    const result = readModel.getRecipeById(id).then(result => {
+        if (!result) {
             return Boom.notFound("Recipe ID not found.");
         }
 
@@ -72,14 +75,14 @@ function changeRecipe(request, reply) {
 }
 
 function deleteRecipe(request, reply) {
-    const id = request.params.param;
+    const id = parseInt(request.params.param);
 
-    const result = readModel.getRecipeById(id).then(storedRecipe => {
-        if (!storedRecipe) {
+    const result = readModel.getRecipeById(id).then(result => {
+        if (!result) {
             return Boom.notFound('Recipe ID not found.');
         }
 
-        if (storedRecipe.Favorite) {
+        if (result.Favorite) {
             return Boom.badRequest('Cannot delete a favorite!');
         }
 

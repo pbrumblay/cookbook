@@ -5,13 +5,12 @@ COPY package.json /tmp/package.json
 RUN cd /tmp && npm install
 RUN mkdir -p /dist && cp -a /tmp/node_modules /dist/ && cp -a /tmp/package.json /dist/
 
-COPY www /dist/www/
-COPY api /dist/api/
-COPY server.js /dist/
-COPY start.sh /dist/
-
+COPY . /dist
+RUN chown node:node /dist
 WORKDIR /dist
+USER node
+ENV GOOGLE_APPLICATION_CREDENTIALS /home/node/creds/datastore-svc-acct.json
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ./start.sh

@@ -1,23 +1,11 @@
 server:
-  build: .
+  image: cookbook:1.0.8
   ports:
-   - "8080:80"
+   - "8080:8080"
    - "5858:5858"
-  links:
-   - db
   environment:
    - DEBUG=true
    - APP_CLIENT_ID=538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com
    - JWT_SECRET=tacos
   volumes:
-   - .:/dist
-
-db:
-  image: mongo:latest
-  ports:
-  - "27017:27017"
-
-import:
-  image: pbrumblay/cookbook-import:latest
-  links:
-   - db
+   - ~/Downloads/datastore-svc-acct.json:/home/node/creds/datastore-svc-acct.json

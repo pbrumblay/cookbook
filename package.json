@@ -1,16 +1,17 @@
 {
   "name": "JS-Cookbook",
   "description": "a sample app to test drive a node.js-based service",
-  "version": "0.0.1",
+  "version": "1.0.2",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "start": "nodemon -L server.js",
-    "debug": "nodemon --debug -L server.js",
-    "debug-brk": "nodemon --debug-brk -L server.js",
+    "debug": "nodemon --trace-warnings --debug -L server.js",
+    "debug-brk": "nodemon --trace-warnings --debug-brk -L server.js",
     "test": "node tests/cookbook.js"
   },
   "dependencies": {
+    "@google-cloud/datastore": "^0.7.0",
     "hapi": "^13.3.0",
     "hapi-auth-jwt2": "^7.0.1",
     "inert": "^3.2.0",

@@ -3,9 +3,8 @@
 <head>
 	<title ng-bind="title"></title>
     <meta charset="utf-8">
-	<meta name="google-signin-scope" content="profile email">
-	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
 	<link href="content/app.css" rel="stylesheet"/>
 	<link href="content/xeditable.css" rel="stylesheet"/>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -19,28 +18,43 @@
 			<div class="nav navbar-right">
 				<a href="#" class="navbar-text" ng-show="userPicture" onclick="signOut();">Sign Out</a>
 				<img class="userImage img-circle" ng-attr-alt="{{fullName}}" ng-show="userPicture"  ng-attr-src="{{userPicture}}" />
-				<div class="g-signin2 userImage"  ng-show="!userPicture" data-onsuccess="onSignIn" data-theme="dark" data></div>
+				<div class="g-signin2 userImage"  ng-show="loginState == 'loggedOut'" data-onsuccess="onSignIn" data-theme="dark" data></div>
 				<div class="navbar-text" ng-show="accessLevel">{{accessLevel}}</div>
 			</div>
         </div>
     </header>
 
 	<script>
-		function onSignIn(googleUser) {
+		window.onload = function() {
+		    console.log('onload');
+		    var scope = angular.element($('#recipeBody')).scope();
+            var auth2 = gapi.auth2.getAuthInstance();
+            if(!auth2.isSignedIn.get()) {
+                console.log('logging out from onload');
+                scope.logout();
+            } else {
+                console.log('logged in from onload');
+			}
+		};
+
+        function onSignIn(googleUser) {
+            console.log('onSignIn');
+            var scope = angular.element($('#recipeBody')).scope();
 			var profile = googleUser.getBasicProfile();
-			var scope = angular.element($('#recipeBody')).scope();
 			scope.login(googleUser.getAuthResponse().id_token);
 		}
 
 		function signOut() {
-			var auth2 = gapi.auth2.getAuthInstance();
+            console.log('signOut');
+            var scope = angular.element($('#recipeBody')).scope();
+            var auth2 = gapi.auth2.getAuthInstance();
 			auth2.signOut().then(function () {
-				var scope = angular.element($('#recipeBody')).scope();
+			    console.log('logging out from signOut');
 				scope.logout();
 			});
 		}
 	</script>
-    <div id="ui-view" class="container" ng-show="userName">
+    <div id="ui-view" class="container" ng-show="loginState == 'loggedIn'">
 		<div class="container">
 			<div class="col-md-6 hidden-print">
 
@@ -127,14 +141,18 @@
 			</div>
 		</div>
     </div>
-	<div id="not-logged-in" class="container" ng-show="!userName">
+	<div id="not-logged-in" class="container" ng-show="loginState == 'loggedOut'">
 		<div class="col-md-6 hidden-print alert alert-danger">
 			<strong>Please sign in.</strong>
 		</div>
 	</div>
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+	<div id="not-logged-in" class="container" ng-show="loginState == 'unknown'">
+		<div class="col-md-6 hidden-print alert alert-danger">
+			<strong>Checking account ...</strong>
+		</div>
+	</div>
+	<script src="client/jquery-2.2.4.min.js" ></script>
+	<script src="client/angular.min.js"></script>
 	<script src="client/services.js"></script>
 	<script src="client/controllers.js"></script>
 	<script src="client/xeditable.js"></script>
