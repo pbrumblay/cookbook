@@ -46,7 +46,7 @@ angular.module('app.services', [])
     var svc = {
         async: function (recipe) {
             if(recipe) {
-                let promise;
+                var promise;
                 if(recipe.Id) {
                     promise = $http.put('/api/recipes/' + recipe.Id, recipe);
                 } else {

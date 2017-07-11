@@ -95,8 +95,8 @@ angular.module('app.controllers', [])
 
         $scope.saveRecipe = function() {
             $scope.error = null;
-            for (let i = $scope.currentRecipe.Ingredients.length; i--;) {
-                let r = $scope.currentRecipe.Ingredients[i];
+            for (var i = $scope.currentRecipe.Ingredients.length; i--;) {
+                var r = $scope.currentRecipe.Ingredients[i];
                 if (r.isDeleted) {
                     $scope.currentRecipe.Ingredients.splice(i, 1);
                 }
@@ -153,8 +153,8 @@ angular.module('app.controllers', [])
 
         // cancel all changes
         $scope.cancel = function() {
-            for (let i = $scope.currentRecipe.Ingredients.length; i--;) {
-                let r = $scope.currentRecipe.Ingredients[i];
+            for (var i = $scope.currentRecipe.Ingredients.length; i--;) {
+                var r = $scope.currentRecipe.Ingredients[i];
                 // undelete
                 if (r.isDeleted) {
                     delete r.isDeleted;
