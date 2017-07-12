@@ -1,0 +1,31 @@
+.editable-textarea {
+    display: block;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+.editable-textarea > div > textarea {
+    height: 200px
+}
+
+.editable-wrap {
+    padding-top: 10px;
+    padding-bottom: 2px;
+    padding-right: 2px;
+    padding-left: 2px;
+    width: 50%;
+}
+
+.editable-wrap > div > select {
+}
+
+.editable-wrap > div > input {
+}
+
+.btn-form {
+    height: 10px
+}
+
+.edit-title {
+    padding: 15px
+}

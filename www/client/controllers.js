@@ -102,17 +102,18 @@ angular.module('app.controllers', [])
                 }
             };
             saveRecipeSvc.async($scope.currentRecipe).then(
-                function(data) {
+                function(response) {
                     $scope.showSuccess = true;
                     $scope.showFailure = false;
                     $scope.alertMessage = 'Saved!';
+                    $scope.currentRecipe = response.data;
                     doSearch();
                 },
                 function(error) {
                     $scope.showSuccess = false;
                     $scope.showFailure = true;
                     $scope.error = error;
-                    $scope.alertMessage = 'Error saving recipe: ' + data.Name;
+                    $scope.alertMessage = 'Error saving recipe: ' + $scope.currentRecipe.Name;
                 }
             )
         };

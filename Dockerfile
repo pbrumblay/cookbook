@@ -13,4 +13,4 @@ ENV GOOGLE_APPLICATION_CREDENTIALS /home/node/creds/datastore-svc-acct.json
 
 EXPOSE 8080
 
-CMD ./start.sh
+CMD npm start

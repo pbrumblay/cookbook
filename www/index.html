@@ -7,6 +7,7 @@
 	<meta name="google-signin-client_id" content="538908077140-932r8111cah6ipsld1ojsb4uvc55hfv2.apps.googleusercontent.com">
 	<link href="content/app.css" rel="stylesheet"/>
 	<link href="content/xeditable.css" rel="stylesheet"/>
+	<link href="content/overrides.css" rel="stylesheet"/>
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body id="recipeBody" ng-controller="homeController">
@@ -90,7 +91,7 @@
 			<div class="col-md-6" ng-show="!error && currentRecipe">
 				<form editable-form name="recipeForm" onaftersave="saveRecipe()">
 					<div class="panel panel-primary row">
-						<div class="panel-heading" editable-text="currentRecipe.Name" e-required>{{currentRecipe.Name}}</div>
+						<strong class="edit-title" ng-show="recipeForm.$visible">Title: </strong><div class="panel-heading" editable-text="currentRecipe.Name" e-required>{{currentRecipe.Name}}</div>
 						<div class="panel-body">
 							<div class="buttons pull-right">
 								<!-- button to show form -->
@@ -113,14 +114,16 @@
 							<div>
 								<strong>Source: </strong><span editable-text="currentRecipe.Source">{{currentRecipe.Source}}</span>
 							</div>
-							<div class="row">
 
-								<strong class="col-md-3">Description: </strong><span class="col-md-9" e-class="col-md-9" editable-textarea="currentRecipe.Description">{{currentRecipe.Description}}</span>
+							<div>
+                                <h4>Description</h4>
+								<div editable-textarea="currentRecipe.Description">{{currentRecipe.Description}}</div>
 							</div>
 
 							<div>
 								<h4>Ingredients</h4>
 								<table class="table table-bordered table-striped">
+									<tr ng-show="!recipeForm.$visible"><th>Amount</th><th>Name</th></tr>
 									<tr ng-repeat="i in currentRecipe.Ingredients | filter:filterIngredient">
 										<td editable-text="i.Amount" e-form="recipeForm" class="text-right">{{i.Amount}}</td>
 										<td editable-text="i.Name" e-form="recipeForm">{{i.Name}}</td>
