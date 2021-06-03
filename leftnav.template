@@ -1,0 +1,12 @@
+<!-- Leftnav -->
+{{#each this}}
+<a
+    href="#r{{Id}}"
+    id="r{{Id}}-list"
+    role="tab"
+    aria-controls="r{{Id}}"
+    data-bs-toggle="list"
+    class="list-group-item list-group-item-action">
+    {{Name}}
+</a>
+{{/each}}
