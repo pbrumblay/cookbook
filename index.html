@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+        <style>
+        .scroll-me {
+            max-height: calc(100vh - 9rem);
+            overflow-y: auto;
+        }
+        </style>
+
+        <title>Recipes</title>
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Recipes</a>
+            </div>
+        </nav>
+        <div id="maincontent" class="row">
+            <div class="col-4 scroll-me">
+              <div class="list-group" id="list-tab" role="tablist">
+              </div>
+            </div>
+            <div class="col-8">
+              <div class="tab-content" id="nav-tabContent">
+              </div>
+            </div>
+        </div>
+
+    </body>
+    <script>
+
+        Promise.all([
+            fetch('http://recipes.tyrconsulting.com/leftnav.template'),
+            fetch('http://recipes.tyrconsulting.com/panel.template'),
+            fetch('http://recipes.tyrconsulting.com/recipes.json')
+        ]).then(responses => {
+            return Promise.all(responses.map(r => {
+                if(r.headers.get("Content-Type") === "application/json") {
+                    return r.json();
+                } else {
+                    return r.text();
+                }
+            }));
+        })
+        .then(data => {
+            leftNav = document.getElementById('list-tab');
+            tabPanel = document.getElementById('nav-tabContent');
+
+            leftnavTemplate = Handlebars.compile(data[0]);
+            panelTemplate = Handlebars.compile(data[1]);
+            navLinks = leftnavTemplate(data[2]);
+            panelContent = panelTemplate(data[2]);
+            leftNav.innerHTML = navLinks;
+            tabPanel.innerHTML = panelContent;
+        })
+        .catch(error => {
+            mainContent = document.getElementById('maincontent');
+            var p = document.createElement('p');
+            p.appendChild(
+                document.createTextNode('Error: ' + error.message)
+            );
+            document.body.insertBefore(p, mainContent);
+        });
+    </script>
+</html>
